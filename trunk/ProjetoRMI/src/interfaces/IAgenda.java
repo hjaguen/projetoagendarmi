@@ -1,10 +1,9 @@
 package interfaces;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import classes.Contato;
-
-public interface IAgenda {
+public interface IAgenda extends Remote {
 	
 	public void consultarDisponibilidade() throws RemoteException;
 	

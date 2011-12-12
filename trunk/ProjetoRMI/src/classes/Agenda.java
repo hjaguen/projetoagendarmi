@@ -13,9 +13,6 @@ import java.util.Scanner;
 
 public class Agenda extends UnicastRemoteObject implements IAgenda{
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private ArrayList<Evento> eventos;
 	private ArrayList<Contato> contatos;
@@ -51,31 +48,6 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 		
 	}
 
-	public static void main (String[] args){
-		try {
-			Agenda a = new Agenda();
-			Contato c = new Contato();
-			Scanner entrada = new Scanner(System.in);
-			System.out.println("Digite seu nome:");
-			c.setNome(entrada.nextLine());
-			System.out.println("Digite seu email:");
-			c.setEmail(entrada.nextLine());
-			a.setUsuario(c);
-			IServidor s = (IServidor) Naming.lookup("servidor");
-			s.registraAgenda(c.getNome(), a);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NotBoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		
-		
-	}
 	
 	//Métodos da Agenda
 	@Override

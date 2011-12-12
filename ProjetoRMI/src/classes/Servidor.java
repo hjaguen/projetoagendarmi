@@ -36,12 +36,20 @@ public class Servidor extends UnicastRemoteObject implements IServidor{
 	}
 
 	@Override
-	public void registraAgenda(String n, Agenda a){
+	public void registraAgenda(String n){
 		if (agendas.containsKey(n)){
 			System.out.println("Nome existente!");
 			return;
 		}
-		agendas.put(n, a);
+		Agenda a;
+		try {
+			a = new Agenda();
+			agendas.put(n, a);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 	@Override

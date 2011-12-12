@@ -17,11 +17,11 @@ public class Servidor extends UnicastRemoteObject implements IServidor{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Map<String, Agenda> agendas;
+	private Map<String, IAgenda> agendas;
 
 	protected Servidor() throws RemoteException {
 		super();
-		agendas = new TreeMap<String, Agenda>();
+		agendas = new TreeMap<String, IAgenda>();
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -36,20 +36,12 @@ public class Servidor extends UnicastRemoteObject implements IServidor{
 	}
 
 	@Override
-	public void registraAgenda(String n){
+	public String registraAgenda(String n, IAgenda a){
 		if (agendas.containsKey(n)){
-			System.out.println("Nome existente!");
-			return;
+			return "Nome existente!";
 		}
-		Agenda a;
-		try {
-			a = new Agenda();
-			agendas.put(n, a);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		agendas.put(n, a);
+		return "Sucesso!";
 	}
 
 	@Override

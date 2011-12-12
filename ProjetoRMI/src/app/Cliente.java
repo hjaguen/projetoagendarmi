@@ -27,7 +27,7 @@ public class Cliente {
 			c.setEmail(entrada.nextLine());
 			a.setUsuario(c);
 			IServidor s = (IServidor) Naming.lookup("servidor");
-			s.registraAgenda(c.getNome());
+			s.registraAgenda(c.getNome(), a);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

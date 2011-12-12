@@ -27,7 +27,15 @@ public class Cliente {
 			c.setEmail(entrada.nextLine());
 			a.setUsuario(c);
 			IServidor s = (IServidor) Naming.lookup("servidor");
-			s.registraAgenda(c.getNome(), a);
+			if(s.consultaAgenda(c.getNome())){
+				System.out.println("Agenda com o mesmo nome já existe!");
+				System.exit(0);
+			}
+			else{
+				Naming.rebind(c.getNome(), a);
+				s.registraAgenda(c.getNome());
+			}
+			
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

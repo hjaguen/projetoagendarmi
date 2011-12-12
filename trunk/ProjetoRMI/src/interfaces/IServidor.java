@@ -7,8 +7,8 @@ import classes.Agenda;
 
 public interface IServidor extends Remote{
 	
-	public String registraAgenda(String n, IAgenda a) throws RemoteException;
+	public String registraAgenda(String n) throws RemoteException;
 	
-	public Agenda retornaAgenda() throws RemoteException;
+	public boolean consultaAgenda(String n) throws RemoteException;
 
 }

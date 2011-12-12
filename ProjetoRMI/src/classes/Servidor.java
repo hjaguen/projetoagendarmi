@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -17,11 +18,11 @@ public class Servidor extends UnicastRemoteObject implements IServidor{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Map<String, IAgenda> agendas;
+	private ArrayList<String> agendas;
 
 	protected Servidor() throws RemoteException {
 		super();
-		agendas = new TreeMap<String, IAgenda>();
+		agendas = new ArrayList<String>();
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -36,18 +37,19 @@ public class Servidor extends UnicastRemoteObject implements IServidor{
 	}
 
 	@Override
-	public String registraAgenda(String n, IAgenda a){
-		if (agendas.containsKey(n)){
+	public String registraAgenda(String n){
+		if (agendas.contains(n)){
 			return "Nome existente!";
 		}
-		agendas.put(n, a);
+		agendas.add(n);
 		return "Sucesso!";
 	}
 
 	@Override
-	public Agenda retornaAgenda() throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean consultaAgenda(String n) throws RemoteException {
+		if (agendas.contains(n))
+			return true;
+		return false;
 	}
 
 }

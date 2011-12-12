@@ -5,12 +5,13 @@ import interfaces.IAgenda;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 public class Agenda extends UnicastRemoteObject implements IAgenda{
 	
 	private static final long serialVersionUID = 1L;
 	private ArrayList<Evento> eventos;
-	private ArrayList<Contato> contatos;
+	private TreeMap<String, Contato> contatos;
 	private Contato usuario;
 	
 	public ArrayList<Evento> getEventos() {
@@ -21,11 +22,11 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 		this.eventos = eventos;
 	}
 
-	public ArrayList<Contato> getContatos() {
+	public TreeMap<String, Contato> getContatos() {
 		return contatos;
 	}
 
-	public void setContatos(ArrayList<Contato> contatos) {
+	public void setContatos(TreeMap<String, Contato> contatos) {
 		this.contatos = contatos;
 	}
 

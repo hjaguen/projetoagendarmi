@@ -3,6 +3,7 @@ package classes;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class Evento implements Serializable {
@@ -12,7 +13,7 @@ public class Evento implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	private String descricao;
-	private Calendar data;
+	private Date data;
 	private List<Contato> contatos;
 	
 	public Evento(){
@@ -27,11 +28,11 @@ public class Evento implements Serializable {
 		this.descricao = descricao;
 	}
 
-	public Calendar getData() {
+	public Date getData() {
 		return data;
 	}
 
-	public void setData(Calendar data) {
+	public void setData(Date data) {
 		this.data = data;
 	}
 

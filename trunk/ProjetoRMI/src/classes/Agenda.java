@@ -5,6 +5,7 @@ import interfaces.IAgenda;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
 public class Agenda extends UnicastRemoteObject implements IAgenda{
@@ -20,6 +21,9 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 
 	public void setEventos(ArrayList<Evento> eventos) {
 		this.eventos = eventos;
+	}
+	public void addEventos(Evento e) {
+		eventos.add(e);
 	}
 
 	public TreeMap<String, Contato> getContatos() {
@@ -53,9 +57,9 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 	}
 
 	@Override
-	public void adicionarEvento() throws RemoteException {
-		// TODO Auto-generated method stub
+	public boolean adicionarEvento(Evento e) throws RemoteException {
 		
+		return true;
 	}
 
 	@Override

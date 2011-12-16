@@ -43,5 +43,8 @@ public class Evento implements Serializable {
 	public void setContatos(List<Contato> contatos) {
 		this.contatos = contatos;
 	}
+	public void addContato(Contato c) {
+		contatos.add(c);
+	}
 
 }

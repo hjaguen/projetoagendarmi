@@ -30,17 +30,24 @@ public class Cliente {
 		Evento ev = new Evento();
 		ArrayList<Contato> c = new ArrayList<Contato>();
 		Scanner entrada = new Scanner(System.in); 
-		System.out.println("Digite o Contato que você deseja convidar (em branco para sair): ");
+		System.out.println("Digite o Contato que você deseja convidar: ");
 		String nome = entrada.nextLine();
 		TreeMap<String, Contato> contatoTree = a.getContatos();
+		ArrayList<Contato> co = new ArrayList<Contato>();
+
 		
-		while (nome != "") {
-			c.add(contatoTree.get(nome));
+		//Obtém nome dos Contatos para serem enviados os convites
+		while (nome != "" || c.size() == 0) {
+			if((contatoTree.get(nome)) != null) {
+				
+				c.add(contatoTree.get(nome));
+		}
+			else System.out.println("Contato inexistente");
+			
 			System.out.println("Digite o Contato que você deseja convidar (em branco para sair): ");
 			nome = entrada.nextLine();
 		}
 		try {
-		ev.setContatos(c);
 		System.out.println("Digite a descrição do Evento: ");
 		ev.setDescricao(entrada.nextLine());
 		
@@ -50,25 +57,36 @@ public class Cliente {
 		   Date data = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dataString);
 		   ev.setData(data);
 
-		for (int i = 0; i < c.size(); i++) {
+		for (int i = 0; i <= c.size(); i++) {
 			Contato cliente = c.get(i);
 		
-			if (s.consultaAgenda(cliente.getNome())) {
+			if (s.consultaAgenda(cliente.getNome()) == true) {
 	
 				IAgenda agenda = (IAgenda) Naming.lookup(cliente.getNome());
 				//Se retorno for true, adiciona
-				if(agenda.adicionarEvento(ev)) {
-					a.addEventos(ev);
+				if(agenda.adicionarEvento(ev) == true) {
+					co.add(cliente);
 					contador++;
 				}
+				else
+					System.out.println("Contato: " + cliente.getNome() + " rejeitou seu convite");
 			}
 			else {
-				System.out.println("Contato "+ cliente.getNome() + " não existe!");
+				System.out.println("Contato "+ cliente.getNome() + " não tem uma Agenda!");
 			}
 		}
 		if (contador == 0) {
 			System.out.println("Nenhum evento foi adicionado, os contatos recusaram o convite ou já estavam ocupados");
 		}
+		else
+			ev.setContatos(co);
+			for (int i=0; i <= co.size(); i++) {
+				Contato cliente = co.get(i);
+				IAgenda agenda = (IAgenda) Naming.lookup(cliente.getNome());
+				agenda.addEventos(ev);
+			}
+			a.addEventos(ev);
+			System.out.println("Contatos foram adicionados com sucesso ao evento!");
 		} catch (RemoteException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

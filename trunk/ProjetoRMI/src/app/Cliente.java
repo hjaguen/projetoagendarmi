@@ -48,22 +48,24 @@ public class Cliente {
 			nome = entrada.nextLine();
 		}
 		try {
+			//Obtém a descrição do evento e adiciona ao evento
 		System.out.println("Digite a descrição do Evento: ");
 		ev.setDescricao(entrada.nextLine());
 		
-		
+		//Obtém a data do evento e adiciona ao evento
 		   System.out.println("Digite a data do Evento: (Formato: dd/MM/yyyy HH:mm:ss) ");
 		   String dataString = entrada.nextLine();
 		   Date data = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dataString);
 		   ev.setData(data);
 
+		   //Roda a lista de contatos pra quem vc escolheu enviar os convites
 		for (int i = 0; i <= c.size(); i++) {
 			Contato cliente = c.get(i);
-		
+		//Se a Agenda dele estiver rodando, continua
 			if (s.consultaAgenda(cliente.getNome()) == true) {
 	
 				IAgenda agenda = (IAgenda) Naming.lookup(cliente.getNome());
-				//Se retorno for true, adiciona
+				//Se o usuário aceitar o convite, adiciona a uma lista onde estarão os contatos que aceitaram o convite
 				if(agenda.adicionarEvento(ev) == true) {
 					co.add(cliente);
 					contador++;
@@ -75,15 +77,24 @@ public class Cliente {
 				System.out.println("Contato "+ cliente.getNome() + " não tem uma Agenda!");
 			}
 		}
+		//Se não ninguém aceitou o convite, manda mensagem
 		if (contador == 0) {
 			System.out.println("Nenhum evento foi adicionado, os contatos recusaram o convite ou já estavam ocupados");
 		}
 		else
+			//Se alguém aceitou o convite, adiciona o usuário que fez os convites também na lista de contatos
+			//Seta todos os contatos no evento
+			co.add(a.getUsuario());
 			ev.setContatos(co);
+			//Itera a lista de contatos e adiciona o evento em cada um deles
 			for (int i=0; i <= co.size(); i++) {
+				
 				Contato cliente = co.get(i);
+
+				if (cliente != a.getUsuario()) {
 				IAgenda agenda = (IAgenda) Naming.lookup(cliente.getNome());
 				agenda.addEventos(ev);
+				}
 			}
 			a.addEventos(ev);
 			System.out.println("Contatos foram adicionados com sucesso ao evento!");

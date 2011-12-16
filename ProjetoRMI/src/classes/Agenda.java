@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.TreeMap;
 
 public class Agenda extends UnicastRemoteObject implements IAgenda{
@@ -58,8 +59,20 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 
 	@Override
 	public boolean adicionarEvento(Evento e) throws RemoteException {
+		Scanner entrada = new Scanner(System.in); 
+		System.out.println("Você recebeu um novo convite!");
+		System.out.println("Dia e hora: " + e.getData());
+		System.out.println("Descrição do Evento: " + e.getDescricao());
+		System.out.println("Deseja aceitar esse Convite? (S/N)");
+		String resp = entrada.nextLine();
+		resp = resp.toUpperCase();
+		if (resp.equals("S") || resp.equals("SIM")) {
+			return true;
+		}
+		else
+			return false;
 		
-		return true;
+		
 	}
 
 	@Override

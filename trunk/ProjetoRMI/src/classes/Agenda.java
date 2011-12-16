@@ -34,6 +34,9 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 	public void setContatos(TreeMap<String, Contato> contatos) {
 		this.contatos = contatos;
 	}
+	public void addContatos(String n,Contato c) {
+		this.contatos.put(n, c);
+	}
 
 	public Contato getUsuario() {
 		return usuario;

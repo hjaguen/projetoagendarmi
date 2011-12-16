@@ -13,4 +13,6 @@ public interface IAgenda extends Remote {
 	public boolean adicionarEvento(Evento e) throws RemoteException;
 	
 	public void listarEventos() throws RemoteException;
+	
+	public void addEventos(Evento e) throws RemoteException;
 }

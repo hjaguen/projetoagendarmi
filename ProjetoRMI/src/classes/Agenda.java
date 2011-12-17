@@ -1,7 +1,9 @@
 package classes;
 
 import interfaces.IAgenda;
+import interfaces.IServidor;
 
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -35,6 +37,10 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 		this.contatos = contatos;
 	}
 	public void addContatos(String n,Contato c) {
+		if((contatos.containsKey(n))) {
+			System.out.println("Este contato já está adicionado!");
+			return;
+		}
 		this.contatos.put(n, c);
 	}
 
@@ -49,6 +55,7 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 	public Agenda() throws RemoteException {
 		
 		eventos = new ArrayList<Evento>();
+		contatos = new TreeMap<String,Contato>();
 		
 	}
 
@@ -82,6 +89,33 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 	public void listarEventos() throws RemoteException {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void adicionarContatos(String[] nomes) throws RemoteException{
+		try {
+			for (String nome : nomes) {
+				IAgenda ia = (IAgenda)Naming.lookup(nome);
+				addContatos(nome,ia.getUsuario());
+				System.out.println("Contato "+nome+" adicionado com sucesso!");
+			}			
+		} catch (Exception e) {
+			System.out.println("Contato está offline!");
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void removerContatos(String[] nomes)
+			throws RemoteException {
+		try {
+			for (String nome : nomes) {
+				contatos.remove(nome);
+				System.out.println("Contato "+nome+" removido com sucesso!");
+			}			
+		} catch (Exception e) {
+			System.out.println("Contato está offline!");
+			e.printStackTrace();
+		}		
 	}
 
 }

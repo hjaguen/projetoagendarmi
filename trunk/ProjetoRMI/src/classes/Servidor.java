@@ -52,4 +52,17 @@ public class Servidor extends UnicastRemoteObject implements IServidor{
 		return false;
 	}
 
+	@Override
+	public void excluiAgenda(String n) throws RemoteException {
+		if (agendas.contains(n)){
+			agendas.remove(n);
+		}
+		
+	}
+
+	@Override
+	public ArrayList<String> listarAgendas() throws RemoteException {
+		return agendas;
+	}
+
 }

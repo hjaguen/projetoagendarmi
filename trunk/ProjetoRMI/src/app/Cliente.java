@@ -105,31 +105,6 @@ public class Cliente {
 		
 	}
 	
-	public static void adicionarContato(String nome, Agenda a, IServidor s){
-
-		TreeMap<String, Contato> contatoTree = a.getContatos();
-		if((contatoTree.get(nome)).getNome() == nome) {
-			System.out.println("Este contato já está adicionado!");
-		return;
-		}
-		
-		
-		try {
-			if(!s.consultaAgenda(nome)){
-				System.out.println("Não há contatos registrados com esse nome");
-				//System.exit(0);
-			}
-			else{
-				IAgenda ia = (IAgenda)Naming.lookup(nome);
-				a.addContatos(ia.getUsuario().getNome(),ia.getUsuario());
-				System.out.println("Contato "+nome+" adicionado com sucesso!");
-			}
-		} catch (Exception e) {
-			System.out.println("Contato está offline!");
-		}
-		return;
-	}
-	
 	public static void listarEventos(String nome){
 		try {
 			IAgenda ia = (IAgenda)Naming.lookup(nome);

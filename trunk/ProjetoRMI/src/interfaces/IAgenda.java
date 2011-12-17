@@ -19,5 +19,9 @@ public interface IAgenda extends Remote {
 	
 	public Contato getUsuario() throws RemoteException;
 	
+	public void adicionarContatos(String[] nomes) throws RemoteException;
+	
+	public void removerContatos(String[] nomes) throws RemoteException;
+	
 	public ArrayList<Evento> getEventos() throws RemoteException;
 }

@@ -138,7 +138,7 @@ public class Cliente {
 				System.exit(0);
 			} else {
 				Naming.rebind(c.getNome(), a);
-				s.registraAgenda(c.getNome());
+				//s.registraAgenda(c.getNome());
 			}
 
 		} catch (MalformedURLException e) {

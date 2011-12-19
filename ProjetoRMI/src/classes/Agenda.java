@@ -1,15 +1,18 @@
 package classes;
 
 import interfaces.IAgenda;
-import interfaces.IServidor;
+import interfaces.ICliente;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.Date;
 import java.util.TreeMap;
+
+import javax.swing.JFrame;
+
+import view.Cliente;
 
 public class Agenda extends UnicastRemoteObject implements IAgenda{
 	
@@ -17,6 +20,7 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 	private ArrayList<Evento> eventos;
 	private TreeMap<String, Contato> contatos;
 	private Contato usuario;
+	private ICliente cliente;
 	
 	public ArrayList<Evento> getEventos() {
 		return eventos;
@@ -59,43 +63,18 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 		
 	}
 
-	
-	//Métodos da Agenda
-	@Override
-	public void consultarDisponibilidade() throws RemoteException {
-		
-		
-	}
-
-	@Override
-	public boolean adicionarEvento(Evento e) throws RemoteException {
-		Scanner entrada = new Scanner(System.in); 
-		System.out.println("Você recebeu um novo convite!");
-		System.out.println("Dia e hora: " + e.getData());
-		System.out.println("Descrição do Evento: " + e.getDescricao());
-		System.out.println("Deseja aceitar esse Convite? (S/N)");
-		String resp = entrada.nextLine();
-		resp = resp.toUpperCase();
-		if (resp.equals("S") || resp.equals("SIM")) {
-			return true;
-		}
-		else
-			return false;
-		
-		
-	}
-
 	@Override
 	public void listarEventos() throws RemoteException {
 		// TODO Auto-generated method stub
 		
 	}
 	
-	public void adicionarContatos(String[] nomes) throws RemoteException{
+	public void adicionarContatos(Object[] nomes) throws RemoteException{
 		try {
-			for (String nome : nomes) {
-				IAgenda ia = (IAgenda)Naming.lookup(nome);
-				addContatos(nome,ia.getUsuario());
+			for (Object nome : nomes) {
+				String n = (String) nome;
+				IAgenda ia = (IAgenda)Naming.lookup(n);
+				addContatos(n,ia.getUsuario());
 				System.out.println("Contato "+nome+" adicionado com sucesso!");
 			}			
 		} catch (Exception e) {
@@ -105,17 +84,68 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 	}
 
 	@Override
-	public void removerContatos(String[] nomes)
+	public void removerContatos(Object[] nomes)
 			throws RemoteException {
 		try {
-			for (String nome : nomes) {
-				contatos.remove(nome);
-				System.out.println("Contato "+nome+" removido com sucesso!");
+			for (Object nome : nomes) {
+				String n = (String) nome;
+				contatos.remove(n);
+				System.out.println("Contato "+n+" removido com sucesso!");
 			}			
 		} catch (Exception e) {
 			System.out.println("Contato está offline!");
 			e.printStackTrace();
 		}		
+	}
+
+	public void setCliente(ICliente cliente) {
+		this.cliente = cliente;
+	}
+
+	public ICliente getCliente(){
+		return this.cliente;
+	}
+
+	@Override
+	public ArrayList<String> consultarDisponibilidade(Date dataInicio, Date dataFim,
+			Object[] nomes) throws RemoteException {
+		ArrayList<String> resultado = new ArrayList<String>();
+		try {
+			for (Object nome : nomes) {
+				String n = (String) nome;
+				IAgenda ia = (IAgenda)Naming.lookup(n);
+				for (Evento evento : ia.getEventos()) {
+					if((dataInicio.after(evento.getHoraInicio())&& dataInicio.before(evento.getHoraFim()))
+							|| (dataFim.after(evento.getHoraInicio())&& dataFim.before(evento.getHoraFim()))){
+						resultado.add(n);
+					}
+				}
+			}
+			
+		} catch (Exception e) {
+			System.out.println("Contato está offline!");
+			e.printStackTrace();
+			
+		}
+		return resultado;
+		
+	}
+
+	@Override
+	public void confirmarEvento(Evento e) throws RemoteException {
+		for (String nome : e.getContatos().keySet()) {
+			IAgenda ia = cliente.getServidor().consultaAgenda(nome);
+			ia.addEventos(e);
+			ICliente c = ia.getCliente();
+			c.atualizar();
+		}
+		
+	}
+
+	@Override
+	public void enviarConvites() throws RemoteException {
+		
+		
 	}
 
 }

@@ -1,36 +1,56 @@
 package view;
 
+import interfaces.IAgenda;
+import interfaces.ICliente;
 import interfaces.IServidor;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.List;
 import java.awt.TextArea;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.Date;
 import java.util.Scanner;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.border.LineBorder;
+
+import threads.RespostaThread;
+
 import classes.Agenda;
 import classes.Contato;
 
 import com.toedter.calendar.JCalendar;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.List;
 
-public class Cliente {
+public class Cliente extends UnicastRemoteObject implements ICliente{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JFrame frame;
-	private Agenda agenda;
+	private IAgenda agenda;
 	private IServidor servidor;
 	public CriaContato cc;
-	private List listContatos;
+	public CriaEvento ce;
+	private JList listContatos;
+	private JCalendar calendar;
+	private TextArea textAreaEventos;
 
 	/**
 	 * Launch the application.
@@ -49,14 +69,16 @@ public class Cliente {
 					System.out.println("Digite seu email:");
 					c.setEmail(entrada.nextLine());
 					a.setUsuario(c);
-					
-					if (s.consultaAgenda(c.getNome())) {
+
+					if (s.consultaAgenda(c.getNome())!=null) {
 						System.out
 								.println("Agenda com o mesmo nome já existe!");
 						System.exit(0);
 					} else {
 						window.setAgenda(a);
+						a.setCliente(window);
 						window.setServidor(s);
+						window.getFrame().setTitle(c.getNome());
 						Naming.rebind(c.getNome(), a);
 						s.registraAgenda(c.getNome());
 					}
@@ -81,7 +103,7 @@ public class Cliente {
 	/**
 	 * Create the application.
 	 */
-	public Cliente() {
+	public Cliente() throws RemoteException{
 		initialize();
 	}
 
@@ -94,13 +116,14 @@ public class Cliente {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
-		JCalendar calendar = new JCalendar();
+		calendar = new JCalendar();
 		calendar.setBounds(10, 11, 191, 153);
 		frame.getContentPane().add(calendar);
-		
-		cc = new CriaContato(this);
 
-		JButton btnAdicionarContato = new JButton("Adicionar");		
+		cc = new CriaContato(this);
+		ce = new CriaEvento(this);
+
+		JButton btnAdicionarContato = new JButton("Adicionar");
 		btnAdicionarContato.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
@@ -116,7 +139,18 @@ public class Cliente {
 		frame.getContentPane().add(btnAdicionarContato);
 
 		JButton btnCriaEvento = new JButton("Criar Evento");
-		
+		btnCriaEvento.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ce.getListContatos().setModel(listContatos.getModel());
+				ce.getListContatos().setSelectedIndices(
+						listContatos.getSelectedIndices());
+				Date data = calendar.getDate();
+				ce.getTextFieldDateEditorData().setDate(data);
+				ce.getTextAreaDescricao().setText(textAreaEventos.getText());
+				ce.setVisible(true);
+			}
+		});
+
 		btnCriaEvento.setBounds(546, 227, 112, 23);
 		frame.getContentPane().add(btnCriaEvento);
 
@@ -131,44 +165,45 @@ public class Cliente {
 
 		JButton btnExcluiContato = new JButton("Excluir");
 		btnExcluiContato.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {				
+			public void actionPerformed(ActionEvent arg0) {
 				try {
-					String[] c = listContatos.getSelectedItems();
-					agenda.removerContatos(c);					
+					Object[] c = listContatos.getSelectedValues();
+					agenda.removerContatos(c);
 					listarContatos();
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}				
+				}
 			}
 		});
 		btnExcluiContato.setBounds(110, 199, 91, 23);
 		frame.getContentPane().add(btnExcluiContato);
 
-		TextArea textAreaEventos = new TextArea();
+		textAreaEventos = new TextArea();
 		textAreaEventos.setBounds(218, 256, 440, 174);
 		frame.getContentPane().add(textAreaEventos);
-		
-		listContatos = new List();
-		listContatos.setMultipleSelections(true);
+
+		DefaultListModel model = new DefaultListModel();
+		listContatos = new JList(model);
+		listContatos.setBorder(new LineBorder(new Color(0, 0, 0)));
 		listContatos.setBounds(10, 256, 191, 174);
 		frame.getContentPane().add(listContatos);
-		
+
 		JLabel lblEventos = new JLabel("Eventos do Dia");
 		lblEventos.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblEventos.setBounds(220, 11, 112, 19);
 		frame.getContentPane().add(lblEventos);
-		
+
 		List list = new List();
 		list.setBounds(218, 40, 440, 165);
 		frame.getContentPane().add(list);
-		
+
 		JButton btnListarEventos = new JButton("Listar Eventos");
 		btnListarEventos.setBounds(47, 227, 125, 23);
 		frame.getContentPane().add(btnListarEventos);
-		
+
 		frame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e){
+			public void windowClosing(WindowEvent e) {
 				try {
 					servidor.excluiAgenda(agenda.getUsuario().getNome());
 				} catch (RemoteException e1) {
@@ -178,11 +213,17 @@ public class Cliente {
 			}
 		});
 	}
-	
-	public void listarContatos(){
-		listContatos.removeAll();
-		for (Contato c : agenda.getContatos().values()) {
-			listContatos.add(c.getNome());
+
+	public void listarContatos() {
+		DefaultListModel model = (DefaultListModel) listContatos.getModel();
+		model.removeAllElements();
+		try {
+			for (Contato c : agenda.getContatos().values()) {
+				model.addElement(c.getNome());
+			}
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		this.frame.repaint();
 	}
@@ -191,7 +232,7 @@ public class Cliente {
 		this.agenda = agenda;
 	}
 
-	public Agenda getAgenda() {
+	public IAgenda getAgenda() {
 		return agenda;
 	}
 
@@ -211,11 +252,40 @@ public class Cliente {
 		this.frame = frame;
 	}
 
-	public void setListContatos(List listContatos) {
+	public void setListContatos(JList listContatos) {
 		this.listContatos = listContatos;
 	}
 
-	public List getListContatos() {
+	public JList getListContatos() {
 		return listContatos;
 	}
+
+	public JCalendar getCalendar() {
+		return calendar;
+	}
+
+	public void setCalendar(JCalendar calendar) {
+		this.calendar = calendar;
+	}
+
+	public void setTextAreaEventos(TextArea textAreaEventos) {
+		this.textAreaEventos = textAreaEventos;
+	}
+
+	public TextArea getTextAreaEventos() {
+		return textAreaEventos;
+	}
+
+	@Override
+	public void atualizar() throws RemoteException {
+		frame.repaint();
+	}
+
+	@Override
+	public int responderConvite(String msg) throws RemoteException {
+		return JOptionPane.showConfirmDialog(frame, msg,"Responder Convite", JOptionPane.YES_NO_OPTION);
+	}
+	
+	
+
 }

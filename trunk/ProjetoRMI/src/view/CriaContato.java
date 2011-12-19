@@ -4,26 +4,27 @@ import interfaces.IServidor;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.TextArea;
-import java.awt.Label;
 import java.awt.Font;
+import java.awt.Label;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JList;
-import java.awt.List;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
 
 public class CriaContato extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 	private Cliente pai;
-	private List listContatos;
+	private JList listContatos;
 
 	/**
 	 * Create the dialog.
@@ -43,8 +44,9 @@ public class CriaContato extends JDialog {
 		label.setBounds(10, 10, 164, 22);
 		contentPanel.add(label);
 		
-		listContatos = new List();
-		listContatos.setMultipleSelections(true);
+		DefaultListModel model = new DefaultListModel();
+		listContatos = new JList(model);
+		listContatos.setBorder(new LineBorder(new Color(0, 0, 0)));
 		listContatos.setBounds(10, 38, 414, 181);
 		contentPanel.add(listContatos);
 		{
@@ -56,7 +58,7 @@ public class CriaContato extends JDialog {
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {						
 						try {
-							String[] c = listContatos.getSelectedItems();
+							Object[] c = listContatos.getSelectedValues();
 							pai.getAgenda().adicionarContatos(c);
 							pai.listarContatos();
 							pai.cc.setVisible(false);
@@ -88,12 +90,13 @@ public class CriaContato extends JDialog {
 	
 	public void listarContatos(ArrayList<String> c){
 		try {
-			listContatos.removeAll();
+			DefaultListModel model = (DefaultListModel) listContatos.getModel();
+			model.removeAllElements();
 			IServidor s = pai.getServidor();
 			String nomePai = pai.getAgenda().getUsuario().getNome();
 			for (String agenda : s.listarAgendas()) {
 				if(!(nomePai.equals(agenda)) && !(pai.getAgenda().getContatos().containsKey(agenda)))
-					listContatos.add(agenda);
+					model.addElement(agenda);
 			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block

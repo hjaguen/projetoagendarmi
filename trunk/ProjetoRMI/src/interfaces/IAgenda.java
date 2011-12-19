@@ -3,15 +3,18 @@ package interfaces;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
+import java.util.TreeMap;
 
-import classes.*;
+import threads.RespostaThread;
+import view.Cliente;
+
+import classes.Contato;
+import classes.Evento;
 
 public interface IAgenda extends Remote {
 	
-	public void consultarDisponibilidade() throws RemoteException;
-	
-	public boolean adicionarEvento(Evento e) throws RemoteException;
+	public ArrayList<String> consultarDisponibilidade(Date dataInicio,Date dataFim,Object[] nomes) throws RemoteException;
 	
 	public void listarEventos() throws RemoteException;
 	
@@ -19,9 +22,18 @@ public interface IAgenda extends Remote {
 	
 	public Contato getUsuario() throws RemoteException;
 	
-	public void adicionarContatos(String[] nomes) throws RemoteException;
+	public ICliente getCliente() throws RemoteException;
 	
-	public void removerContatos(String[] nomes) throws RemoteException;
+	public TreeMap<String, Contato> getContatos() throws RemoteException;
+	
+	public void adicionarContatos(Object[] nomes) throws RemoteException;
+	
+	public void removerContatos(Object[] nomes) throws RemoteException;
 	
 	public ArrayList<Evento> getEventos() throws RemoteException;
+	
+	public void confirmarEvento(Evento e) throws RemoteException;
+	
+	public void enviarConvites() throws RemoteException;
+
 }

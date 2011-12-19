@@ -14,6 +14,6 @@ public interface IServidor extends Remote{
 	
 	public void excluiAgenda (String n) throws RemoteException;
 	
-	public boolean consultaAgenda(String n) throws RemoteException;
+	public IAgenda consultaAgenda(String n) throws RemoteException;
 
 }

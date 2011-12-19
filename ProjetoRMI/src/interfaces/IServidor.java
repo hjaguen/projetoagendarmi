@@ -10,7 +10,7 @@ public interface IServidor extends Remote{
 	
 	public ArrayList<String> listarAgendas() throws RemoteException;
 	
-	public String registraAgenda(String n) throws RemoteException;
+	public String registraAgenda(String n,String i) throws RemoteException;
 	
 	public void excluiAgenda (String n) throws RemoteException;
 	

@@ -13,10 +13,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -61,8 +64,18 @@ public class Cliente extends UnicastRemoteObject implements ICliente {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					IServidor s = (IServidor) Naming.lookup("servidor");
+					LocateRegistry.getRegistry("10.10.0.112", Registry.REGISTRY_PORT);
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
+				try {
+					
+					IServidor s = (IServidor) Naming.lookup("rmi://10.10.0.112/servidor");
 					Cliente window = new Cliente();
+					String ip = InetAddress.getLocalHost().getHostAddress();
+					if(!ip.equals("10.10.0.112")){
+						LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
+					}
 					Agenda a = new Agenda();
 					Contato c = new Contato();
 					Scanner entrada = new Scanner(System.in);
@@ -71,7 +84,6 @@ public class Cliente extends UnicastRemoteObject implements ICliente {
 					System.out.println("Digite seu email:");
 					c.setEmail(entrada.nextLine());
 					a.setUsuario(c);
-
 					if (s.consultaAgenda(c.getNome()) != null) {
 						System.out
 								.println("Agenda com o mesmo nome já existe!");
@@ -80,9 +92,9 @@ public class Cliente extends UnicastRemoteObject implements ICliente {
 						window.setAgenda(a);
 						a.setCliente(window);
 						window.setServidor(s);
-						window.getFrame().setTitle(c.getNome());
-						Naming.rebind(c.getNome(), a);
-						s.registraAgenda(c.getNome());
+						window.getFrame().setTitle(c.getNome());						
+						Naming.rebind("rmi://"+ip+"/"+c.getNome(), a);
+						s.registraAgenda(c.getNome(),ip);
 					}
 
 					window.frame.setVisible(true);

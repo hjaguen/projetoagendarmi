@@ -12,5 +12,7 @@ public interface ICliente extends Remote{
 	public void atualizar() throws RemoteException;
 	
 	public int responderConvite(String msg) throws RemoteException;
+	
+	public void exibirEventosData() throws RemoteException;
 
 }

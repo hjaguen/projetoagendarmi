@@ -73,7 +73,7 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 		try {
 			for (Object nome : nomes) {
 				String n = (String) nome;
-				IAgenda ia = (IAgenda)Naming.lookup(n);
+				IAgenda ia = cliente.getServidor().consultaAgenda(n);
 				addContatos(n,ia.getUsuario());
 				System.out.println("Contato "+nome+" adicionado com sucesso!");
 			}			
@@ -113,10 +113,11 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 		try {
 			for (Object nome : nomes) {
 				String n = (String) nome;
-				IAgenda ia = (IAgenda)Naming.lookup(n);
+				IAgenda ia = cliente.getServidor().consultaAgenda(n);
 				for (Evento evento : ia.getEventos()) {
 					if((dataInicio.after(evento.getHoraInicio())&& dataInicio.before(evento.getHoraFim()))
-							|| (dataFim.after(evento.getHoraInicio())&& dataFim.before(evento.getHoraFim()))){
+							|| (dataFim.after(evento.getHoraInicio())&& dataFim.before(evento.getHoraFim()))
+							|| (dataInicio.equals(evento.getHoraInicio())) || (dataFim.equals(evento.getHoraFim()))){
 						resultado.add(n);
 					}
 				}
@@ -137,7 +138,7 @@ public class Agenda extends UnicastRemoteObject implements IAgenda{
 			IAgenda ia = cliente.getServidor().consultaAgenda(nome);
 			ia.addEventos(e);
 			ICliente c = ia.getCliente();
-			c.atualizar();
+			c.exibirEventosData();
 		}
 		
 	}

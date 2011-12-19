@@ -45,7 +45,7 @@ public class RespostaThread implements Runnable, Serializable {
 			try {
 				criador.getAgenda().addEventos(e);
 				criador.getAgenda().confirmarEvento(e);
-				criador.getFrame().repaint();				
+				criador.exibirEventosData();				
 			} catch (RemoteException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -61,7 +61,7 @@ public class RespostaThread implements Runnable, Serializable {
 			for (String key : evento.getContatos().keySet()) {
 				String msg = "O usuario "
 						+ criador.getAgenda().getUsuario().getNome()
-						+ "deseja iniciar um evento com voce.\n";
+						+ " deseja iniciar um evento com voce.\n";
 				msg += "Descrição: " + evento.getDescricao();
 				
 				IAgenda ia = criador.getServidor().consultaAgenda(key);
@@ -90,8 +90,11 @@ public class RespostaThread implements Runnable, Serializable {
 		}
 
 		evento.setContatos(aux);
-
-		confirmaEvento(evento);
+		
+		if(evento.getContatos().size()<1){
+			JOptionPane.showMessageDialog(criador.getFrame(), "O evento não pode ser marcado - Nenhum usuário confirmou participação");
+		}else
+			confirmaEvento(evento);
 
 	}
 

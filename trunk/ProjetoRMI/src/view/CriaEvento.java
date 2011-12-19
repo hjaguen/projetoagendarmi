@@ -61,47 +61,50 @@ public class CriaEvento extends JDialog {
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
-		
+
 		textFieldDateEditorData = new JTextFieldDateEditor();
+		textFieldDateEditorData.setMaskVisible(true);
 		textFieldDateEditorData.setBounds(10, 37, 93, 20);
 		contentPanel.add(textFieldDateEditorData);
-		
+
 		Label lblData = new Label("Data");
 		lblData.setFont(new Font("Dialog", Font.BOLD, 12));
 		lblData.setBounds(10, 9, 62, 22);
 		contentPanel.add(lblData);
-		
+
 		Label lblHoraInicio = new Label("Hora de In\u00EDcio");
 		lblHoraInicio.setFont(new Font("Dialog", Font.BOLD, 12));
 		lblHoraInicio.setBounds(10, 66, 93, 22);
 		contentPanel.add(lblHoraInicio);
-		
+
 		textFieldDateEditorHoraInicio = new JTextFieldDateEditor();
+		textFieldDateEditorHoraInicio.setToolTipText("HH:mm");
 		textFieldDateEditorHoraInicio.setDateFormatString("HH:mm");
 		textFieldDateEditorHoraInicio.setBounds(10, 94, 93, 20);
 		contentPanel.add(textFieldDateEditorHoraInicio);
-		
+
 		Label lblHoraTermino = new Label("Hora de T\u00E9rmino");
 		lblHoraTermino.setFont(new Font("Dialog", Font.BOLD, 12));
 		lblHoraTermino.setBounds(119, 66, 108, 22);
 		contentPanel.add(lblHoraTermino);
-		
+
 		textFieldDateEditorHoraFim = new JTextFieldDateEditor();
+		textFieldDateEditorHoraFim.setToolTipText("HH:mm");
 		textFieldDateEditorHoraFim.setDateFormatString("HH:mm");
 		textFieldDateEditorHoraFim.setBounds(119, 94, 108, 20);
 		contentPanel.add(textFieldDateEditorHoraFim);
-		
+
 		Label lblContatos = new Label("Contatos");
 		lblContatos.setFont(new Font("Dialog", Font.BOLD, 12));
 		lblContatos.setBounds(246, 9, 62, 22);
 		contentPanel.add(lblContatos);
-		
+
 		DefaultListModel model = new DefaultListModel();
 		listContatos = new JList(model);
 		listContatos.setBorder(new LineBorder(new Color(0, 0, 0)));
 		listContatos.setBounds(246, 37, 177, 320);
 		contentPanel.add(listContatos);
-		
+
 		textAreaDescricao = new TextArea();
 		textAreaDescricao.setBounds(10, 130, 217, 237);
 		contentPanel.add(textAreaDescricao);
@@ -114,40 +117,52 @@ public class CriaEvento extends JDialog {
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						try {
-							String data = getTextFieldDateEditorData().getText();
-							String horaInicio = getTextFieldDateEditorHoraInicio().getText();
-							String horaFim = getTextFieldDateEditorHoraFim().getText();
-							DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-							Date dataInicio = (Date) formatter.parse(data+" "+horaInicio);
-							Date dataFim = (Date) formatter.parse(data+" "+horaFim);
-							ArrayList<String> res = pai.getAgenda().consultarDisponibilidade(dataInicio,dataFim,listContatos.getSelectedValues());
-							if (res.size() > 0){
+							String data = getTextFieldDateEditorData()
+									.getText();
+							String horaInicio = getTextFieldDateEditorHoraInicio()
+									.getText();
+							String horaFim = getTextFieldDateEditorHoraFim()
+									.getText();
+							DateFormat formatter = new SimpleDateFormat(
+									"dd/MM/yyyy HH:mm");
+							Date dataInicio = (Date) formatter.parse(data + " "
+									+ horaInicio);
+							Date dataFim = (Date) formatter.parse(data + " "
+									+ horaFim);
+							ArrayList<String> res = pai.getAgenda()
+									.consultarDisponibilidade(dataInicio,
+											dataFim,
+											listContatos.getSelectedValues());
+							if (res.size() > 0) {
 								String msg = "O(s) Contato(s) a seguir: ";
 								for (String string : res) {
-									msg+=string+" ";
+									msg += string + " ";
 								}
-								msg+="já possuem compromissos agendados nesse horário";
+								msg += "já possuem compromissos agendados nesse horário";
 								JOptionPane.showMessageDialog(pai.ce, msg);
-							}
-							else if(listContatos.getSelectedIndices().length==0){
-								JOptionPane.showMessageDialog(pai.ce, "Ao menos um contato deve ser selecionado!");
-							}
-							else{
+							} else if (listContatos.getSelectedIndices().length == 0) {
+								JOptionPane
+										.showMessageDialog(pai.ce,
+												"Ao menos um contato deve ser selecionado!");
+							} else {
 								Evento e = new Evento();
 								e.setData(dataInicio);
 								e.setHoraInicio(dataInicio);
 								e.setHoraFim(dataFim);
 								e.setDescricao(getTextAreaDescricao().getText());
 								TreeMap<String, Contato> tmp = new TreeMap<String, Contato>();
-								for (Object val : listContatos.getSelectedValues()) {
+								for (Object val : listContatos
+										.getSelectedValues()) {
 									String nome = (String) val;
-									if(pai.getServidor().consultaAgenda(nome) != null){
-										IAgenda ia = (IAgenda)Naming.lookup(nome);
+									if (pai.getServidor().consultaAgenda(nome) != null) {
+										IAgenda ia = pai.getServidor()
+												.consultaAgenda(nome);
 										tmp.put(nome, ia.getUsuario());
 									}
 								}
 								e.setContatos(tmp);
-								RespostaThread r = new RespostaThread(e, pai, tmp.size());								
+								RespostaThread r = new RespostaThread(e, pai,
+										tmp.size());
 								new Thread(r).start();
 								pai.ce.setVisible(false);
 							}
@@ -155,15 +170,10 @@ public class CriaEvento extends JDialog {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						} catch (ParseException e) {
-							JOptionPane.showMessageDialog(pai.ce, "Preenche corretamente os campos de hora!");
-						} catch (MalformedURLException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (NotBoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							JOptionPane.showMessageDialog(pai.ce,
+									"Preencha corretamente os campos de hora!");
 						}
-						
+
 					}
 				});
 				okButton.setActionCommand("OK");
@@ -181,9 +191,9 @@ public class CriaEvento extends JDialog {
 				buttonPane.add(cancelButton);
 			}
 		}
-		
+
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		
+
 	}
 
 	public void setPai(Cliente pai) {
@@ -202,7 +212,8 @@ public class CriaEvento extends JDialog {
 		return listContatos;
 	}
 
-	public void setTextFieldDateEditorData(JTextFieldDateEditor textFieldDateEditorData) {
+	public void setTextFieldDateEditorData(
+			JTextFieldDateEditor textFieldDateEditorData) {
 		this.textFieldDateEditorData = textFieldDateEditorData;
 	}
 
@@ -235,6 +246,5 @@ public class CriaEvento extends JDialog {
 			JTextFieldDateEditor textFieldDateEditorHoraFim) {
 		this.textFieldDateEditorHoraFim = textFieldDateEditorHoraFim;
 	}
-	
-	
+
 }
